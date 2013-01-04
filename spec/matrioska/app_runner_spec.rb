@@ -25,9 +25,30 @@ module Matrioska
     end
 
     describe "#wait_for_input" do
+      before do
+        subject.map_app(3) { p "foo" }
+        subject.map_app(5, Object)
+      end
+
       it "should call #wait_for_digit" do
-        mock_controller.should_receive(:wait_for_digit).with(-1)
+        mock_controller.should_receive(:wait_for_digit).once.with(-1)
+        subject.should_receive(:match_and_run).once
         subject.wait_for_input
+      end
+
+      it "should invoke #match_and_run" do
+        mock_controller.should_receive(:wait_for_digit).with(-1).and_return("5")
+        mock_controller.should_receive(:invoke).once.with(subject.app_map["5"], metadata)
+        subject.wait_for_input
+      end
+    end
+
+    describe "#app_loop" do
+      it "loops as long as the listener is running" do
+        subject.should_receive(:running?).and_return(true, true, false)
+        mock_controller.should_receive(:wait_for_digit).with(-1).twice
+        subject.should_receive(:match_and_run).twice
+        subject.app_loop
       end
     end
 
@@ -74,7 +95,7 @@ module Matrioska
       end
 
       it "uses instance_exec if the payload is a Proc" do
-        mock_controller.should_receive(:instance_exec).once.with(metadata, subject.app_map["3"])
+        mock_controller.should_receive(:instance_exec).once.with(metadata, &subject.app_map["3"])
         mock_controller.should_receive(:invoke).never
         subject.match_and_run("3")
       end

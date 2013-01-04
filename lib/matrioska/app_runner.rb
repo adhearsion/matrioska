@@ -1,6 +1,6 @@
 module Matrioska
   class AppRunner
-    attr_reader :current_input, :app_map
+
     def initialize(controller)
       @controller = controller
       @app_map = {}
@@ -12,14 +12,27 @@ module Matrioska
       @run_loop = Thread.new { app_loop }
     end
 
-    def app_loop
-      while @running do
+    def stop
+      @running = false
+    end
 
+    def running?
+      @running
+    end
+
+    def app_map
+      @app_map
+    end
+
+    def app_loop
+      while running? do
+        wait_for_input
       end
     end
 
     def wait_for_input
       result = @controller.wait_for_digit(-1)
+      match_and_run result.to_s
     end
 
     def map_app(digit, controller=nil, &block)
@@ -43,7 +56,10 @@ module Matrioska
 
     def match_and_run(digit)
       return unless match = @app_map[digit]
-      @controller.instance_exec(@controller.metadata, match) if match.is_a? Proc
+      Adhearsion.logger.info "#match_and_run called with #{digit}"
+      Adhearsion.logger.info "app_map is #{@app_map}"
+      Adhearsion.logger.info "It seems to be a block" if match.is_a? Proc
+      @controller.instance_exec(@controller.metadata, &match) if match.is_a? Proc
       @controller.invoke(match, @controller.metadata) if match.is_a? Class
     end
   end
