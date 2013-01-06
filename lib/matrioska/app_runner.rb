@@ -1,38 +1,26 @@
 module Matrioska
   class AppRunner
+    include Adhearsion::CallController::Utility
 
-    def initialize(controller)
-      @controller = controller
+    def initialize(call)
+      @call = call
       @app_map = {}
     end
 
     def start
-      return nil if @run_loop && @run_loop.alive?
-      @running = true
-      @run_loop = Thread.new { app_loop }
-    end
-
-    def stop
-      @running = false
-    end
-
-    def running?
-      @running
+      component = Punchblock::Component::Input.new({ :mode => :dtmf,
+          :grammar => {
+            :value => grammar_accept
+          }
+      })
+      component.register_event_handler Punchblock::Event::Complete do |event|
+        handle_input_complete event
+      end
+      @call.write_and_await_response component
     end
 
     def app_map
       @app_map
-    end
-
-    def app_loop
-      while running? do
-        wait_for_input
-      end
-    end
-
-    def wait_for_input
-      result = @controller.wait_for_digit(-1)
-      match_and_run result.to_s
     end
 
     def map_app(digit, controller=nil, &block)
@@ -40,7 +28,7 @@ module Matrioska
       range = "1234567890*#"
 
       unless range.include?(digit) && digit.size == 1
-        raise ArgumentError, "The first argument should be a single digit String or number in the range 1234567890*#" 
+        raise ArgumentError, "The first argument should be a single digit String or number in the range 1234567890*#"
       end
 
       payload = if block_given?
@@ -55,12 +43,23 @@ module Matrioska
     end
 
     def match_and_run(digit)
-      return unless match = @app_map[digit]
-      Adhearsion.logger.info "#match_and_run called with #{digit}"
-      Adhearsion.logger.info "app_map is #{@app_map}"
-      Adhearsion.logger.info "It seems to be a block" if match.is_a? Proc
-      @controller.instance_exec(@controller.metadata, &match) if match.is_a? Proc
-      @controller.invoke(match, @controller.metadata) if match.is_a? Class
+      if match = @app_map[digit]
+        Adhearsion.logger.info "#match_and_run called with #{digit}"
+        callback = lambda {|call| start }
+        
+        @call.execute_controller(nil, callback, &match) if match.is_a? Proc
+        if match.is_a? Class
+          payload = match.new(@call)
+          @call.execute_controller(payload, callback)
+        end
+      end
+      start
+    end
+
+    def handle_input_complete(event)
+      result = event.reason.respond_to?(:utterance) ? event.reason.utterance : nil
+      digit = parse_dtmf result
+      match_and_run digit
     end
   end
 end
