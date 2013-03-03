@@ -5,19 +5,16 @@ require "matrioska/version"
 Gem::Specification.new do |s|
   s.name        = "matrioska"
   s.version     = Matrioska::VERSION
-  s.authors     = ["Plugin Author"]
-  s.email       = ["author@plugin.com"]
+  s.authors     = ["Luca Pradovera"]
+  s.email       = ["lpradovera@mojolingo.com"]
   s.homepage    = ""
-  s.summary     = %q{TODO: Write a gem summary}
-  s.description = %q{TODO: Write a gem description}
+  s.summary     = %q{Adhearsion plugin for in-call apps}
+  s.description = %q{Adhearsion plugin for in-call apps. Provides a features-style interface to run applications in calls.}
 
   s.rubyforge_project = "matrioska"
 
-  # Use the following if using Git
-  # s.files         = `git ls-files`.split("\n")
-  # s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
-  s.files         = Dir.glob("{lib}/**/*") + %w( README.md Rakefile Gemfile)
-  s.test_files    = Dir.glob("{spec}/**/*")
+  s.files         = `git ls-files`.split("\n")
+  s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.require_paths = ["lib"]
 
   s.add_runtime_dependency %q<adhearsion>, ["~> 2.2"]
