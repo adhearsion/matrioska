@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.name        = "matrioska"
   s.version     = Matrioska::VERSION
   s.authors     = ["Luca Pradovera"]
-  s.email       = ["lpradovera@gmail.com"]
+  s.email       = ["lpradovera@mojolingo.com"]
   s.homepage    = ""
   s.summary     = %q{Adhearsion plugin for in-call apps}
   s.description = %q{Adhearsion plugin for in-call apps. Provides a features-style interface to run applications in calls.}
