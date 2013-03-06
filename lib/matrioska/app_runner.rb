@@ -9,16 +9,14 @@ module Matrioska
     end
 
     def start
-      logger.info "MATRIOSKA START CALLED"
-      logger.debug caller.join("\n")
+      logger.debug "MATRIOSKA START CALLED"
       unless @running
         component = Punchblock::Component::Input.new({ :mode => :dtmf,
           :grammar => {
             :value => grammar_accept
           }
         })
-      
-        logger.info "MATRIOSKA STARTING LISTENER"
+        logger.debug "MATRIOSKA STARTING LISTENER"
         component.register_event_handler Punchblock::Event::Complete do |event|
           handle_input_complete event
         end
@@ -51,30 +49,29 @@ module Matrioska
 
     def match_and_run(digit)
       if match = @app_map[digit]
-        logger.info "MATRIOSKA #match_and_run called with #{digit}"
+        logger.debug "MATRIOSKA #match_and_run called with #{digit}"
         @running = true
         callback = lambda do |call|
           @running = false
-          logger.info "MATRIOSKA CALLBACK RESTARTING LISTENER"
+          logger.debug "MATRIOSKA CALLBACK RESTARTING LISTENER"
           start
         end
 
         if match.is_a? Proc
-          logger.info "MATRIOSKA EXECUTING #{payload.to_s} AS BLOCK"
+          logger.debug "MATRIOSKA EXECUTING #{payload.to_s} AS BLOCK"
           @call.execute_controller(nil, callback, &match)
         end
 
         if match.is_a? Class
           payload = match.new(@call)
-          logger.info "MATRIOSKA EXECUTING #{payload.to_s} AS CONTROLLER"
+          logger.debug "MATRIOSKA EXECUTING #{payload.to_s} AS CONTROLLER"
           @call.execute_controller(payload, callback)
         end
       end
-      start
     end
 
     def handle_input_complete(event)
-      logger.info "MATRIOSKA HANDLING INPUT"
+      logger.debug "MATRIOSKA HANDLING INPUT"
       result = event.reason.respond_to?(:utterance) ? event.reason.utterance : nil
       digit = parse_dtmf result
       match_and_run digit unless @running
