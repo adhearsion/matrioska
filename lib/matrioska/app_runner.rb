@@ -15,10 +15,12 @@ module Matrioska
             :value => grammar_accept
           }
       })
-      component.register_event_handler Punchblock::Event::Complete do |event|
-        handle_input_complete event
+      unless @running
+        component.register_event_handler Punchblock::Event::Complete do |event|
+          handle_input_complete event
+        end
+        @call.write_and_await_response component
       end
-      @call.write_and_await_response component
     end
 
     def app_map
@@ -69,6 +71,7 @@ module Matrioska
     end
 
     def handle_input_complete(event)
+      logger.info "MATRIOSKA HANDLING INPUT"
       result = event.reason.respond_to?(:utterance) ? event.reason.utterance : nil
       digit = parse_dtmf result
       match_and_run digit unless @running
