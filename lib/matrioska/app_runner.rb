@@ -49,11 +49,15 @@ module Matrioska
           logger.info "MATRIOSKA CALLBACK RESTARTING LISTENER"
           start
         end
-        
-        @call.execute_controller(nil, callback, &match) if match.is_a? Proc
+
+        if match.is_a? Proc
+          logger.info "MATRIOSKA EXECUTING #{payload.to_s} AS BLOCK"
+          @call.execute_controller(nil, callback, &match)
+        end
+
         if match.is_a? Class
           payload = match.new(@call)
-          logger.info "MATRIOSKA EXECUTING #{payload.to_s}"
+          logger.info "MATRIOSKA EXECUTING #{payload.to_s} AS CONTROLLER"
           @call.execute_controller(payload, callback)
         end
       end
