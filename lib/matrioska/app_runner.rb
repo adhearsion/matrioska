@@ -9,13 +9,14 @@ module Matrioska
     end
 
     def start
-      logger.info "MATRIOSKA STARTING LISTENER"
-      component = Punchblock::Component::Input.new({ :mode => :dtmf,
+      unless @running
+        component = Punchblock::Component::Input.new({ :mode => :dtmf,
           :grammar => {
             :value => grammar_accept
           }
-      })
-      unless @running
+        })
+      
+        logger.info "MATRIOSKA STARTING LISTENER"
         component.register_event_handler Punchblock::Event::Complete do |event|
           handle_input_complete event
         end
