@@ -70,7 +70,7 @@ module Matrioska
     def handle_input_complete(event)
       result = event.reason.respond_to?(:utterance) ? event.reason.utterance : nil
       digit = parse_dtmf result
-      match_and_run digit if @running
+      match_and_run digit unless @running
     end
   end
 end
