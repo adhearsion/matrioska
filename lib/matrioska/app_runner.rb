@@ -9,6 +9,8 @@ module Matrioska
     end
 
     def start
+      logger.info "MATRIOSKA START CALLED"
+      logger.debug caller.join("\n")
       unless @running
         component = Punchblock::Component::Input.new({ :mode => :dtmf,
           :grammar => {
