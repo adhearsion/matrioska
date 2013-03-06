@@ -44,16 +44,16 @@ module Matrioska
 
     def match_and_run(digit)
       if match = @app_map[digit]
-        Adhearsion.logger.info "#match_and_run called with #{digit}"
+        logger.info "MATRIOSKA #match_and_run called with #{digit}"
         callback = lambda do |call|
-          Adhearsion.logger.info "MATRIOSKA CALLBACK RESTARTING LISTENER"
+          logger.info "MATRIOSKA CALLBACK RESTARTING LISTENER"
           start
         end
         
         @call.execute_controller(nil, callback, &match) if match.is_a? Proc
         if match.is_a? Class
           payload = match.new(@call)
-          Adhearsion.logger.info "MATRIOSKA EXECUTING #{payload.to_s}"
+          logger.info "MATRIOSKA EXECUTING #{payload.to_s}"
           @call.execute_controller(payload, callback)
         end
       end
