@@ -5,6 +5,7 @@ module Matrioska
     def initialize(call)
       @call = call
       @app_map = {}
+      @running = false
     end
 
     def start
@@ -45,7 +46,9 @@ module Matrioska
     def match_and_run(digit)
       if match = @app_map[digit]
         logger.info "MATRIOSKA #match_and_run called with #{digit}"
+        @running = true
         callback = lambda do |call|
+          @running = false
           logger.info "MATRIOSKA CALLBACK RESTARTING LISTENER"
           start
         end
@@ -67,7 +70,7 @@ module Matrioska
     def handle_input_complete(event)
       result = event.reason.respond_to?(:utterance) ? event.reason.utterance : nil
       digit = parse_dtmf result
-      match_and_run digit
+      match_and_run digit if @running
     end
   end
 end
