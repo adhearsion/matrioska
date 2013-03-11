@@ -20,7 +20,7 @@ module Matrioska
         component.register_event_handler Punchblock::Event::Complete do |event|
           handle_input_complete event
         end
-        @call.write_and_await_response component
+        @call.write_and_await_response component if @call.active?
       end
     end
 
