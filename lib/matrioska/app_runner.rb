@@ -54,7 +54,11 @@ module Matrioska
         callback = lambda do |call|
           @running = false
           logger.debug "MATRIOSKA CALLBACK RESTARTING LISTENER"
-          start
+          if call.active?
+            start
+          else
+            logger.debug "MATRIOSKA CALLBACK NOT DOING ANYTHING BECAUSE CALL IS DEAD"
+          end
         end
 
         if match.is_a? Proc
