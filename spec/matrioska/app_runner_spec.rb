@@ -2,9 +2,20 @@ require 'spec_helper'
 
 module Matrioska
   describe AppRunner do
-    let(:mock_call) { double 'Call', active?: true }
-    subject { AppRunner.new mock_call }
-    class MockController < Adhearsion::CallController; end
+    let(:call_id) { SecureRandom.uuid }
+    let(:call)    { Adhearsion::Call.new }
+
+    before do
+      double call, write_command: true, id: call_id
+    end
+
+    subject { AppRunner.new call }
+
+    class MockController < Adhearsion::CallController
+      def run
+        call.do_stuff_from_a_class
+      end
+    end
 
     describe "#start" do
       let(:grxml) {
@@ -24,7 +35,7 @@ module Matrioska
       }
 
       it "should start the appropriate component" do
-        mock_call.should_receive(:write_and_await_response).with(input_component)
+        call.should_receive(:write_and_await_response).with(input_component)
         subject.start
       end
     end
@@ -55,26 +66,28 @@ module Matrioska
       end
 
       before do
-        subject.map_app(3) { "foo" }
+        subject.map_app(3) { call.do_stuff_from_a_block }
         subject.map_app(5, MockController)
       end
 
       it "does nothing if there is no match, and restarts the launcher" do
-        mock_call.should_receive(:execute_controller).never
+        call.should_receive(:execute_controller).never
         subject.should_receive(:start).once
         subject.handle_input_complete mock_event("4")
       end
 
       it "executes the block if the payload is a Proc" do
-        mock_call.should_receive(:execute_controller).once.with(&subject.app_map["3"])
+        call.should_receive(:do_stuff_from_a_block).once
         subject.should_receive(:start).once
         subject.handle_input_complete mock_event("3")
+        sleep 0.1 # Give the controller time to finish and the callback to fire
       end
 
       it "executes the controller if the payload is a Class" do
-        mock_call.should_receive(:execute_controller).once.with(kind_of(MockController), kind_of(Proc))
+        call.should_receive(:do_stuff_from_a_class).once
         subject.should_receive(:start).once
         subject.handle_input_complete mock_event("5")
+        sleep 0.1 # Give the controller time to finish and the callback to fire
       end
     end
   end
