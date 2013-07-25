@@ -2,7 +2,7 @@ require 'spec_helper'
 
 module Matrioska
   describe AppRunner do
-    let(:mock_call) { mock('Call') }
+    let(:mock_call) { double 'Call' }
     subject { AppRunner.new mock_call }
     class MockController < Adhearsion::CallController; end
 
@@ -90,7 +90,7 @@ module Matrioska
     end
 
     describe "#handle_input_complete" do
-      let(:mock_event) { mock('Event', :reason => mock('Reason', :utterance => "dtmf-5")) }
+      let(:mock_event) { double('Event', :reason => double('Reason', :utterance => "dtmf-5")) }
       it "runs #match_and_run" do
         subject.should_receive(:match_and_run).with("5").once
         subject.handle_input_complete(mock_event)
