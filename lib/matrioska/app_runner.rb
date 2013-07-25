@@ -11,11 +11,7 @@ module Matrioska
     def start
       logger.debug "MATRIOSKA START CALLED"
       unless @running
-        component = Punchblock::Component::Input.new({ :mode => :dtmf,
-          :grammar => {
-            :value => grammar_accept
-          }
-        })
+        component = Punchblock::Component::Input.new mode: :dtmf, grammar: { value: grammar_accept }
         logger.debug "MATRIOSKA STARTING LISTENER"
         component.register_event_handler Punchblock::Event::Complete do |event|
           handle_input_complete event
