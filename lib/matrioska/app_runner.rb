@@ -43,6 +43,15 @@ module Matrioska
       @app_map[digit] = payload
     end
 
+    def handle_input_complete(event)
+      logger.debug "MATRIOSKA HANDLING INPUT"
+      result = event.reason.respond_to?(:utterance) ? event.reason.utterance : nil
+      digit = parse_dtmf result
+      match_and_run digit unless @running
+    end
+
+    private
+
     def match_and_run(digit)
       if match = @app_map[digit]
         logger.debug "MATRIOSKA #match_and_run called with #{digit}"
@@ -70,13 +79,6 @@ module Matrioska
       else
         start
       end
-    end
-
-    def handle_input_complete(event)
-      logger.debug "MATRIOSKA HANDLING INPUT"
-      result = event.reason.respond_to?(:utterance) ? event.reason.utterance : nil
-      digit = parse_dtmf result
-      match_and_run digit unless @running
     end
   end
 end

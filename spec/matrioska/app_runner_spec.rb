@@ -47,51 +47,34 @@ module Matrioska
           expect { subject.map_app(1, Object) {} }.to raise_error ArgumentError, "You cannot specify both a block and a controller name."
         end
       end
-
-      context "with valid input" do
-        it "properly sets the map for a block" do
-          subject.map_app(3) { p "foo" }
-          subject.app_map["3"].should be_a Proc
-        end
-
-        it "properly sets the map for a class" do
-          subject.map_app(3, Object)
-          subject.app_map["3"].should be_a Class
-        end
-      end
     end
 
-    describe "#match_and_run" do
+    describe "#handle_input_complete" do
+      def mock_event(digit)
+        double 'Event', reason: double('Reason', utterance: "dtmf-#{digit}")
+      end
+
       before do
-        subject.map_app(3) { p "foo" }
+        subject.map_app(3) { "foo" }
         subject.map_app(5, MockController)
       end
 
       it "does nothing if there is no match, and restarts the launcher" do
         mock_call.should_receive(:execute_controller).never
         subject.should_receive(:start).once
-        subject.match_and_run("4")
+        subject.handle_input_complete mock_event("4")
       end
 
       it "executes the block if the payload is a Proc" do
         mock_call.should_receive(:execute_controller).once.with(&subject.app_map["3"])
         subject.should_receive(:start).once
-        subject.match_and_run("3")
+        subject.handle_input_complete mock_event("3")
       end
 
       it "executes the controller if the payload is a Class" do
         mock_call.should_receive(:execute_controller).once.with(kind_of(MockController), kind_of(Proc))
         subject.should_receive(:start).once
-        subject.match_and_run("5")
-      end
-    end
-
-    describe "#handle_input_complete" do
-      let(:mock_event) { double('Event', reason: double('Reason', utterance: "dtmf-5")) }
-
-      it "runs #match_and_run" do
-        subject.should_receive(:match_and_run).with("5").once
-        subject.handle_input_complete(mock_event)
+        subject.handle_input_complete mock_event("5")
       end
     end
   end
