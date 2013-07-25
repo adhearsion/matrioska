@@ -20,10 +20,6 @@ module Matrioska
       end
     end
 
-    def app_map
-      @app_map
-    end
-
     def map_app(digit, controller=nil, &block)
       digit = digit.to_s
       range = "1234567890*#"
@@ -51,6 +47,10 @@ module Matrioska
     end
 
     private
+
+    def app_map
+      @app_map
+    end
 
     def match_and_run(digit)
       if match = @app_map[digit]
