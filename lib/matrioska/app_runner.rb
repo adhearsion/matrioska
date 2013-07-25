@@ -20,7 +20,7 @@ module Matrioska
       end
     end
 
-    def map_app(digit, controller=nil, &block)
+    def map_app(digit, controller = nil, &block)
       digit = digit.to_s
       range = "1234567890*#"
 
