@@ -67,6 +67,8 @@ module Matrioska
           logger.debug "MATRIOSKA EXECUTING #{payload.to_s} AS CONTROLLER"
           @call.execute_controller(payload, callback)
         end
+      else
+        start
       end
     end
 
