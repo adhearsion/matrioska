@@ -2,7 +2,7 @@ require 'spec_helper'
 
 module Matrioska
   describe AppRunner do
-    let(:mock_call) { double 'Call' }
+    let(:mock_call) { double 'Call', active?: true }
     subject { AppRunner.new mock_call }
     class MockController < Adhearsion::CallController; end
 

@@ -58,7 +58,7 @@ module Matrioska
         end
 
         if match.is_a? Proc
-          logger.debug "MATRIOSKA EXECUTING #{payload.to_s} AS BLOCK"
+          logger.debug "MATRIOSKA EXECUTING #{match} AS BLOCK"
           @call.execute_controller(nil, callback, &match)
         end
 
