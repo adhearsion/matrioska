@@ -79,6 +79,8 @@ module Matrioska
       else
         start
       end
+    rescue Adhearsion::Call::Hangup
+      logger.debug "Matrioska terminated because the call was disconnected"
     end
   end
 end

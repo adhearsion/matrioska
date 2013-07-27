@@ -70,10 +70,20 @@ module Matrioska
         subject.map_app(5, MockController)
       end
 
-      it "does nothing if there is no match, and restarts the launcher" do
-        call.should_receive(:execute_controller).never
-        subject.should_receive(:start).once
-        subject.handle_input_complete mock_event("4")
+      context "if there is no match" do
+        it "does nothing, and restarts the launcher" do
+          call.should_receive(:execute_controller).never
+          subject.should_receive(:start).once
+          subject.handle_input_complete mock_event("4")
+        end
+
+        context "if the call has been hung up" do
+          before { call.should_receive(:write_and_await_response).and_raise Adhearsion::Call::Hangup }
+
+          it "should not raise Hangup but stop cleanly" do
+            subject.handle_input_complete mock_event("4")
+          end
+        end
       end
 
       it "executes the block if the payload is a Proc" do
