@@ -5,25 +5,22 @@ module Matrioska
     def initialize(call)
       @call = call
       @app_map = {}
+      @running = false
     end
 
     def start
-      component = Punchblock::Component::Input.new({ :mode => :dtmf,
-          :grammar => {
-            :value => grammar_accept
-          }
-      })
-      component.register_event_handler Punchblock::Event::Complete do |event|
-        handle_input_complete event
+      logger.debug "MATRIOSKA START CALLED"
+      unless @running
+        component = Punchblock::Component::Input.new mode: :dtmf, grammar: { value: grammar_accept }
+        logger.debug "MATRIOSKA STARTING LISTENER"
+        component.register_event_handler Punchblock::Event::Complete do |event|
+          handle_input_complete event
+        end
+        @call.write_and_await_response component if @call.active?
       end
-      @call.write_and_await_response component
     end
 
-    def app_map
-      @app_map
-    end
-
-    def map_app(digit, controller=nil, &block)
+    def map_app(digit, controller = nil, &block)
       digit = digit.to_s
       range = "1234567890*#"
 
@@ -42,24 +39,48 @@ module Matrioska
       @app_map[digit] = payload
     end
 
-    def match_and_run(digit)
-      if match = @app_map[digit]
-        Adhearsion.logger.info "#match_and_run called with #{digit}"
-        callback = lambda {|call| start }
-        
-        @call.execute_controller(nil, callback, &match) if match.is_a? Proc
-        if match.is_a? Class
-          payload = match.new(@call)
-          @call.execute_controller(payload, callback)
-        end
-      end
-      start
-    end
-
     def handle_input_complete(event)
+      logger.debug "MATRIOSKA HANDLING INPUT"
       result = event.reason.respond_to?(:utterance) ? event.reason.utterance : nil
       digit = parse_dtmf result
-      match_and_run digit
+      match_and_run digit unless @running
+    end
+
+    private
+
+    def app_map
+      @app_map
+    end
+
+    def match_and_run(digit)
+      if match = @app_map[digit]
+        logger.debug "MATRIOSKA #match_and_run called with #{digit}"
+        @running = true
+        callback = lambda do |call|
+          @running = false
+          logger.debug "MATRIOSKA CALLBACK RESTARTING LISTENER"
+          if call.active?
+            start
+          else
+            logger.debug "MATRIOSKA CALLBACK NOT DOING ANYTHING BECAUSE CALL IS DEAD"
+          end
+        end
+
+        if match.is_a? Proc
+          logger.debug "MATRIOSKA EXECUTING #{match} AS BLOCK"
+          @call.execute_controller(nil, callback, &match)
+        end
+
+        if match.is_a? Class
+          payload = match.new(@call)
+          logger.debug "MATRIOSKA EXECUTING #{payload.to_s} AS CONTROLLER"
+          @call.execute_controller(payload, callback)
+        end
+      else
+        start
+      end
+    rescue Adhearsion::Call::Hangup
+      logger.debug "Matrioska terminated because the call was disconnected"
     end
   end
 end

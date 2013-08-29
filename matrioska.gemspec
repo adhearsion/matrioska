@@ -7,9 +7,10 @@ Gem::Specification.new do |s|
   s.version     = Matrioska::VERSION
   s.authors     = ["Luca Pradovera"]
   s.email       = ["lpradovera@mojolingo.com"]
-  s.homepage    = ""
+  s.homepage    = "https://github.com/polysics/matrioska"
   s.summary     = %q{Adhearsion plugin for in-call apps}
   s.description = %q{Adhearsion plugin for in-call apps. Provides a features-style interface to run applications in calls.}
+  s.license     = 'MIT'
 
   s.rubyforge_project = "matrioska"
 
@@ -17,8 +18,7 @@ Gem::Specification.new do |s|
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.require_paths = ["lib"]
 
-  s.add_runtime_dependency %q<adhearsion>, ["~> 2.1"]
-  s.add_runtime_dependency %q<activesupport>, [">= 3.0.10"]
+  s.add_runtime_dependency %q<adhearsion>, ["~> 2.4"]
 
   s.add_development_dependency %q<bundler>, ["~> 1.0"]
   s.add_development_dependency %q<rspec>, ["~> 2.5"]
