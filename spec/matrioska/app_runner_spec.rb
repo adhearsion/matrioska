@@ -31,7 +31,7 @@ module Matrioska
       }
 
       let(:input_component) {
-        Punchblock::Component::Input.new mode: :dtmf, grammar: { value: grxml.to_s }
+        Punchblock::Component::Input.new mode: :dtmf, grammar: { value: grxml }
       }
 
       it "should start the appropriate component" do
