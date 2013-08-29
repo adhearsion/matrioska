@@ -10,6 +10,7 @@ Gem::Specification.new do |s|
   s.homepage    = "https://github.com/polysics/matrioska"
   s.summary     = %q{Adhearsion plugin for in-call apps}
   s.description = %q{Adhearsion plugin for in-call apps. Provides a features-style interface to run applications in calls.}
+  s.license     = 'MIT'
 
   s.rubyforge_project = "matrioska"
 
