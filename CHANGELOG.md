@@ -1,5 +1,7 @@
 # develop
 
+# Version 0.1.0
+
 # Version 0.0.2
   * Downgraded Adhearsion version requirement to 2.1
 
