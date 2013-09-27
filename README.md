@@ -8,7 +8,7 @@ By mapping controllers or blocks to the desired applications, a listener object 
 
 ```ruby
 # inside your controller
-runner = Matrioska::AppRunner.new self
+runner = Matrioska::AppRunner.new call
 runner.map_app 3 do
   logger.info "hi there!"
 end
