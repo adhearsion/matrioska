@@ -97,8 +97,8 @@ describe Matrioska::DialWithApps do
   end
 
   describe "#dial_with_apps" do
-    let(:mock_local_runner)  { double Matrioska::AppRunner }
-    let(:mock_remote_runner) { double Matrioska::AppRunner }
+    let(:mock_local_runner)  { Matrioska::AppRunner.new call }
+    let(:mock_remote_runner) { Matrioska::AppRunner.new second_other_mock_call }
 
     before do
       Matrioska::AppRunner.stub(:new).with(call).and_return mock_local_runner
@@ -110,10 +110,10 @@ describe Matrioska::DialWithApps do
     it "starts an app listener on both ends of the call" do
       call.should_receive(:answer).once
 
-      mock_local_runner.should_receive(:foo).once.with(instance_of(Adhearsion::CallController::Dial::ParallelConfirmationDial))
+      mock_local_runner.should_receive(:foo).once
       mock_local_runner.should_receive(:start).once
 
-      mock_remote_runner.should_receive(:foo).once.with(instance_of(Adhearsion::CallController::Dial::ParallelConfirmationDial))
+      mock_remote_runner.should_receive(:bar).once
       mock_remote_runner.should_receive(:start).once
 
       other_mock_call.should_receive(:dial).with(to, from: 'foo').once
@@ -127,15 +127,17 @@ describe Matrioska::DialWithApps do
       end
 
       dial_thread = Thread.new do
-        status = controller.dial_with_apps([to, second_to], :from => 'foo') do |local_runner, remote_runner, dial|
-          local_runner.foo  dial if local_runner
-          remote_runner.foo dial if remote_runner
-        end
+        controller.instance_exec(to,second_to) do |to, second_to|
+            dial_with_apps([to, second_to], from: 'foo') do |dial|
+            local do |runner|
+              runner.foo
+            end
 
-        status.should be_a Adhearsion::CallController::Dial::DialStatus
-        joined_status = status.joins[status.calls.first]
-        joined_status.duration.should == 0.0
-        joined_status.result.should == :no_answer
+            remote do |runner|
+              runner.bar
+            end
+          end
+        end
       end
 
       sleep 0.1
