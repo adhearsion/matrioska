@@ -17,10 +17,6 @@ runner.map_app 5, AppController
 runner.start
 ```
 
-### Author
-
-Original author: [Luca Pradovera](https://github.com/polysics)
-
 ### Links
 
 * [Adhearsion](http://adhearsion.com)
@@ -32,13 +28,13 @@ Original author: [Luca Pradovera](https://github.com/polysics)
 * Fork the project.
 * Make your feature addition or bug fix.
 * Add tests for it. This is important so I don't break it in a future version unintentionally.
-* Commit, do not mess with rakefile, version, or history.
+* Commit, do not mess with Rakefile, version, or history.
   * If you want to have your own version, that is fine but bump version in a commit by itself so I can ignore when I pull
 * Send me a pull request. Bonus points for topic branches.
 
 ### Credits
 
-Original Author: Luca Pradovera
+Original author: [Luca Pradovera](https://github.com/polysics)
 
 Developed by [Mojo Lingo](http://mojolingo.com) in partnership with [RingPlus](http://ringplus.net).
 
