@@ -36,6 +36,14 @@ Original author: [Luca Pradovera](https://github.com/polysics)
   * If you want to have your own version, that is fine but bump version in a commit by itself so I can ignore when I pull
 * Send me a pull request. Bonus points for topic branches.
 
+### Credits
+
+Original Author: Luca Pradovera
+
+Developed by [Mojo Lingo](http://mojolingo.com) in partnership with [RingPlus](http://ringplus.net).
+
+Thanks to [RingPlus](http://ringplus.net) for ongoing sponsorship of Matrioska.
+
 ### Copyright
 
 Copyright (c) 2013 Adhearsion Foundation Inc. MIT license (see LICENSE for details).
