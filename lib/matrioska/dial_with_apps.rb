@@ -33,5 +33,38 @@ module Matrioska
       dial.cleanup_calls
       dial.status
     end
+
+    def dial_with_apps(to, options = {}, &block)
+      dial = Adhearsion::CallController::Dial::ParallelConfirmationDial.new to, options, call
+      yield dial
+
+      local_runner = Matrioska::AppRunner.new call
+      @local_runner_block.call local_runner
+      local_runner.start
+
+      dial.prep_calls do |new_call|
+        new_call.on_joined call do
+          remote_runner = Matrioska::AppRunner.new new_call
+          @remote_runner_block.call remote_runner
+          remote_runner.start
+        end
+      end
+
+      dial.track_originating_call
+      dial.place_calls
+      dial.await_completion
+      dial.cleanup_calls
+      dial.status
+    end
+
+  private
+
+    def local(&block)
+      @local_runner_block = block
+    end
+
+    def remote(&block)
+      @remote_runner_block = block
+    end
   end
 end

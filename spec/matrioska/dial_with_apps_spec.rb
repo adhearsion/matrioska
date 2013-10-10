@@ -95,4 +95,55 @@ describe Matrioska::DialWithApps do
       dial_thread.join.should be_true
     end
   end
+
+  describe "#dial_with_apps" do
+    let(:mock_local_runner)  { Matrioska::AppRunner.new call }
+    let(:mock_remote_runner) { Matrioska::AppRunner.new second_other_mock_call }
+
+    before do
+      Matrioska::AppRunner.stub(:new).with(call).and_return mock_local_runner
+      Matrioska::AppRunner.stub(:new).with(second_other_mock_call).and_return mock_remote_runner
+
+      Adhearsion::OutboundCall.should_receive(:new).and_return other_mock_call, second_other_mock_call
+    end
+
+    it "starts an app listener on both ends of the call" do
+      call.should_receive(:answer).once
+
+      mock_local_runner.should_receive(:foo).once
+      mock_local_runner.should_receive(:start).once
+
+      mock_remote_runner.should_receive(:bar).once
+      mock_remote_runner.should_receive(:start).once
+
+      other_mock_call.should_receive(:dial).with(to, from: 'foo').once
+      other_mock_call.should_receive(:hangup).once.and_return do
+        other_mock_call << mock_end
+      end
+
+      second_other_mock_call.should_receive(:dial).with(second_to, from: 'foo').once
+      second_other_mock_call.should_receive(:join).once.and_return do
+        second_other_mock_call << Punchblock::Event::Joined.new(call_uri: call_id)
+      end
+
+      dial_thread = Thread.new do
+        controller.instance_exec(to,second_to) do |to, second_to|
+            dial_with_apps([to, second_to], from: 'foo') do |dial|
+            local do |runner|
+              runner.foo
+            end
+
+            remote do |runner|
+              runner.bar
+            end
+          end
+        end
+      end
+
+      sleep 0.1
+      second_other_mock_call << mock_answered
+      second_other_mock_call << mock_end
+      dial_thread.join.should be_true
+    end
+  end
 end
