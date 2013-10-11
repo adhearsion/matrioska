@@ -1,3 +1,5 @@
+[![Build Status](https://secure.travis-ci.org/adhearsion/matrioska.png?branch=develop)](http://travis-ci.org/adhearsion/matrioska)
+
 # Matrioska
 
 Matrioska is an Adhearsion plugin for running in-call apps at the press of a DTMF.
