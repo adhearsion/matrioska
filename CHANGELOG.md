@@ -1,5 +1,9 @@
 # develop
 
+# Version 0.2.0
+  * Added `#dial_with_apps` to combine `#dial_with_local_apps` and `#dial_with_remote_apps`
+  * Allow stopping a runner
+
 # Version 0.1.0
   * Added DialWithApps for a simple integration with `#dial`
   * Bugfixes

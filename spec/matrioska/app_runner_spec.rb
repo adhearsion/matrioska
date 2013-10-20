@@ -37,6 +37,24 @@ module Matrioska
       it "should start the appropriate component" do
         call.should_receive(:write_and_await_response).with(input_component)
         subject.start
+        subject.status.should == :started
+      end
+    end
+
+    describe "#stop!" do
+      let(:mock_component) { double Punchblock::Component::Input, register_event_handler: true }
+
+      before do
+        Punchblock::Component::Input.stub(:new).and_return mock_component
+        call.stub(:write_and_await_response)
+        subject.start
+      end
+
+      it "stops the runner" do
+        mock_component.should_receive(:executing?).and_return true
+        mock_component.should_receive :stop!
+        subject.stop!
+        subject.status.should == :stopped
       end
     end
 

@@ -9,15 +9,33 @@ module Matrioska
     end
 
     def start
+      @state = :started
       logger.debug "MATRIOSKA START CALLED"
       unless @running
-        component = Punchblock::Component::Input.new mode: :dtmf, grammar: { value: grammar_accept }
+        @component = Punchblock::Component::Input.new mode: :dtmf, grammar: { value: grammar_accept }
         logger.debug "MATRIOSKA STARTING LISTENER"
-        component.register_event_handler Punchblock::Event::Complete do |event|
+        @component.register_event_handler Punchblock::Event::Complete do |event|
           handle_input_complete event
         end
-        @call.write_and_await_response component if @call.active?
+        @call.write_and_await_response @component if @call.active?
       end
+    end
+
+    def stop!
+      @state = :stopped
+      @component.stop! if @component && @component.executing?
+    end
+
+    def status
+      @state
+    end
+
+    def started?
+      @state == :started
+    end
+
+    def stopped?
+      @state == :stopped
     end
 
     def map_app(digit, controller = nil, &block)
@@ -40,6 +58,10 @@ module Matrioska
     end
 
     def handle_input_complete(event)
+      if @state == :stopped
+        logger.warn "Stopped runner #{self} received event."
+        return
+      end
       logger.debug "MATRIOSKA HANDLING INPUT"
       result = event.reason.respond_to?(:utterance) ? event.reason.utterance : nil
       digit = parse_dtmf result
@@ -60,7 +82,7 @@ module Matrioska
           @running = false
           logger.debug "MATRIOSKA CALLBACK RESTARTING LISTENER"
           if call.active?
-            start
+            start unless stopped?
           else
             logger.debug "MATRIOSKA CALLBACK NOT DOING ANYTHING BECAUSE CALL IS DEAD"
           end
