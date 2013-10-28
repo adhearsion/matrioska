@@ -1,7 +1,5 @@
 require 'spec_helper'
 
-require 'matrioska/dial_with_apps'
-
 describe Matrioska::DialWithApps do
   let(:call_id)           { SecureRandom.uuid }
   let(:call)              { Adhearsion::Call.new }
