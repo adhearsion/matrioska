@@ -1,4 +1,5 @@
 # develop
+  * Don't require manual loading of `DialWithApps`
 
 # Version 0.2.0
   * Added `#dial_with_apps` to combine `#dial_with_local_apps` and `#dial_with_remote_apps`
