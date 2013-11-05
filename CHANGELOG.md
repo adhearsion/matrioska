@@ -1,4 +1,6 @@
 # develop
+
+# Version 0.2.1
   * Don't require manual loading of `DialWithApps`
 
 # Version 0.2.0
