@@ -60,12 +60,11 @@ module Matrioska
 
     describe "#map_app" do
       context "with invalid input" do
-        let(:too_long) { "ab" }
-        let(:wrong) { "a" }
+        let(:long_pattern) { "*99" }
+        let(:wrong) { "a12" }
 
-        it "should raise if the first argument is not a single digit string in the range" do
-          expect { subject.map_app(too_long) {} }.to raise_error ArgumentError, "The first argument should be a single digit String or number in the range 1234567890*#"
-          expect { subject.map_app(wrong) {} }.to raise_error ArgumentError, "The first argument should be a single digit String or number in the range 1234567890*#"
+        it "should raise if the first argument has invalid characters" do
+          expect { subject.map_app(wrong) {} }.to raise_error ArgumentError, "The first argument should be a String or number containing only 1234567890*#"
         end
 
         it "raises if called without either a class or a block" do

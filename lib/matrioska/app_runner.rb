@@ -2,6 +2,8 @@ module Matrioska
   class AppRunner
     include Adhearsion::CallController::Utility
 
+    VALID_DIGITS = /[^0-9*#]/
+
     def initialize(call)
       @call = call
       @app_map = {}
@@ -38,12 +40,12 @@ module Matrioska
       @state == :stopped
     end
 
-    def map_app(digit, controller = nil, &block)
-      digit = digit.to_s
+    def map_app(pattern, controller = nil, &block)
+      pattern = pattern.to_s
       range = "1234567890*#"
 
-      unless range.include?(digit) && digit.size == 1
-        raise ArgumentError, "The first argument should be a single digit String or number in the range 1234567890*#"
+      if VALID_DIGITS.match(pattern)
+        raise ArgumentError, "The first argument should be a String or number containing only 1234567890*#"
       end
 
       payload = if block_given?
@@ -54,7 +56,7 @@ module Matrioska
         controller
       end
 
-      @app_map[digit] = payload
+      @app_map[pattern] = payload
     end
 
     def handle_input_complete(event)
