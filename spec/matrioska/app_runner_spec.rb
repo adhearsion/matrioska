@@ -31,7 +31,7 @@ module Matrioska
       }
 
       let(:input_component) {
-        Punchblock::Component::Input.new mode: :dtmf, grammar: { value: grxml }
+        Punchblock::Component::Input.new mode: :dtmf, inter_digit_timeout: Adhearsion.config[:matrioska].timeout.to_i * 1_000, grammar: { value: grxml }
       }
 
       it "should start the appropriate component" do
@@ -67,6 +67,10 @@ module Matrioska
           expect { subject.map_app(wrong) {} }.to raise_error ArgumentError, "The first argument should be a String or number containing only 1234567890*#"
         end
 
+        it "should not raise if the first argument has multiple valid digits" do
+          expect { subject.map_app(long_pattern) {} }.to_not raise_error
+        end
+
         it "raises if called without either a class or a block" do
           expect { subject.map_app 1 }.to raise_error ArgumentError, "You need to provide a block or a controller name."
         end
@@ -83,7 +87,7 @@ module Matrioska
       end
 
       before do
-        subject.map_app(3) { call.do_stuff_from_a_block }
+        subject.map_app("34*") { call.do_stuff_from_a_block }
         subject.map_app(5, MockController)
       end
 
@@ -106,7 +110,7 @@ module Matrioska
       it "executes the block if the payload is a Proc" do
         call.should_receive(:do_stuff_from_a_block).once
         subject.should_receive(:start).once
-        subject.handle_input_complete mock_event("3")
+        subject.handle_input_complete mock_event("34*")
         sleep 0.1 # Give the controller time to finish and the callback to fire
       end
 

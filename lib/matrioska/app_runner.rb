@@ -14,7 +14,7 @@ module Matrioska
       @state = :started
       logger.debug "MATRIOSKA START CALLED"
       unless @running
-        @component = Punchblock::Component::Input.new mode: :dtmf, grammar: { value: grammar_accept }
+        @component = Punchblock::Component::Input.new mode: :dtmf, inter_digit_timeout: Adhearsion.config[:matrioska].timeout.to_i * 1_000, grammar: { value: grammar_accept }
         logger.debug "MATRIOSKA STARTING LISTENER"
         @component.register_event_handler Punchblock::Event::Complete do |event|
           handle_input_complete event
