@@ -18,13 +18,19 @@ module Matrioska
     end
 
     describe "#start" do
+      before do
+        subject.map_app("34*") { call.do_stuff_from_a_block }
+        subject.map_app(5, MockController)
+      end
+
       let(:grxml) {
-        RubySpeech::GRXML.draw mode: 'dtmf', root: 'inputdigits' do
-          rule id: 'inputdigits', scope: 'public' do
-            one_of do
-              0.upto(9) { |d| item { d.to_s } }
-              item { "#" }
-              item { "*" }
+        RubySpeech::GRXML.draw mode: :dtmf, root: 'options', tag_format: 'semantics/1.0-literals' do
+          rule id: 'options', scope: 'public' do
+            item do
+              one_of do
+                item { "34*" }
+                item { "5" }
+              end
             end
           end
         end

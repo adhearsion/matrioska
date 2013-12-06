@@ -14,7 +14,7 @@ module Matrioska
       @state = :started
       logger.debug "MATRIOSKA START CALLED"
       unless @running
-        @component = Punchblock::Component::Input.new mode: :dtmf, inter_digit_timeout: Adhearsion.config[:matrioska].timeout.to_i * 1_000, grammar: { value: grammar_accept }
+        @component = Punchblock::Component::Input.new mode: :dtmf, inter_digit_timeout: Adhearsion.config[:matrioska].timeout.to_i * 1_000, grammar: { value: build_grammar }
         logger.debug "MATRIOSKA STARTING LISTENER"
         @component.register_event_handler Punchblock::Event::Complete do |event|
           handle_input_complete event
@@ -105,6 +105,23 @@ module Matrioska
       end
     rescue Adhearsion::Call::Hangup
       logger.debug "Matrioska terminated because the call was disconnected"
+    end
+
+    def build_grammar
+      current_app_map = app_map
+      RubySpeech::GRXML.draw mode: :dtmf, root: 'options', tag_format: 'semantics/1.0-literals' do
+        rule id: 'options', scope: 'public' do
+          item do
+            one_of do
+              current_app_map.keys.each do |index|
+                item do
+                  index
+                end
+              end
+            end
+          end
+        end
+      end
     end
   end
 end
