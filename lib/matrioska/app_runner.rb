@@ -14,7 +14,7 @@ module Matrioska
       @state = :started
       logger.debug "MATRIOSKA START CALLED"
       unless @running
-        @component = Punchblock::Component::Input.new mode: :dtmf, inter_digit_timeout: Adhearsion.config[:matrioska].timeout.to_i * 1_000, grammar: { value: build_grammar }
+        @component = Punchblock::Component::Input.new mode: :dtmf, inter_digit_timeout: Adhearsion.config[:matrioska].timeout * 1_000, grammar: { value: build_grammar }
         logger.debug "MATRIOSKA STARTING LISTENER"
         @component.register_event_handler Punchblock::Event::Complete do |event|
           handle_input_complete event
@@ -109,7 +109,7 @@ module Matrioska
 
     def build_grammar
       current_app_map = app_map
-      RubySpeech::GRXML.draw mode: :dtmf, root: 'options', tag_format: 'semantics/1.0-literals' do
+      RubySpeech::GRXML.draw mode: :dtmf, root: 'options' do
         rule id: 'options', scope: 'public' do
           item do
             one_of do

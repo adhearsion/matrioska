@@ -24,7 +24,7 @@ module Matrioska
       end
 
       let(:grxml) {
-        RubySpeech::GRXML.draw mode: :dtmf, root: 'options', tag_format: 'semantics/1.0-literals' do
+        RubySpeech::GRXML.draw mode: :dtmf, root: 'options' do
           rule id: 'options', scope: 'public' do
             item do
               one_of do

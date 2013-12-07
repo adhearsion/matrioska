@@ -10,7 +10,7 @@ module Matrioska
     end
 
     config :matrioska do
-      timeout 2, desc: "Seconds to wait between each digit before trying to resolve match"
+      timeout 2, desc: "Time (in seconds) to wait between each digit before trying to resolve match", transform: Proc.new { |v| v.to_i }
     end
   end
 end
