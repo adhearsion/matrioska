@@ -111,12 +111,10 @@ module Matrioska
       current_app_map = app_map
       RubySpeech::GRXML.draw mode: :dtmf, root: 'options' do
         rule id: 'options', scope: 'public' do
-          item do
-            one_of do
-              current_app_map.keys.each do |index|
-                item do
-                  index
-                end
+          one_of do
+            current_app_map.keys.each do |index|
+              item do
+                index
               end
             end
           end

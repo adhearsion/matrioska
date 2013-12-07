@@ -26,11 +26,9 @@ module Matrioska
       let(:grxml) {
         RubySpeech::GRXML.draw mode: :dtmf, root: 'options' do
           rule id: 'options', scope: 'public' do
-            item do
-              one_of do
-                item { "34*" }
-                item { "5" }
-              end
+            one_of do
+              item { "34*" }
+              item { "5" }
             end
           end
         end
