@@ -2,6 +2,8 @@ module Matrioska
   class AppRunner
     include Adhearsion::CallController::Utility
 
+    VALID_DIGITS = /[^0-9*#]/
+
     def initialize(call)
       @call = call
       @app_map = {}
@@ -12,7 +14,7 @@ module Matrioska
       @state = :started
       logger.debug "MATRIOSKA START CALLED"
       unless @running
-        @component = Punchblock::Component::Input.new mode: :dtmf, grammar: { value: grammar_accept }
+        @component = Punchblock::Component::Input.new mode: :dtmf, inter_digit_timeout: Adhearsion.config[:matrioska].timeout * 1_000, grammar: { value: build_grammar }
         logger.debug "MATRIOSKA STARTING LISTENER"
         @component.register_event_handler Punchblock::Event::Complete do |event|
           handle_input_complete event
@@ -38,12 +40,12 @@ module Matrioska
       @state == :stopped
     end
 
-    def map_app(digit, controller = nil, &block)
-      digit = digit.to_s
+    def map_app(pattern, controller = nil, &block)
+      pattern = pattern.to_s
       range = "1234567890*#"
 
-      unless range.include?(digit) && digit.size == 1
-        raise ArgumentError, "The first argument should be a single digit String or number in the range 1234567890*#"
+      if VALID_DIGITS.match(pattern)
+        raise ArgumentError, "The first argument should be a String or number containing only 1234567890*#"
       end
 
       payload = if block_given?
@@ -54,7 +56,7 @@ module Matrioska
         controller
       end
 
-      @app_map[digit] = payload
+      @app_map[pattern] = payload
     end
 
     def handle_input_complete(event)
@@ -103,6 +105,21 @@ module Matrioska
       end
     rescue Adhearsion::Call::Hangup
       logger.debug "Matrioska terminated because the call was disconnected"
+    end
+
+    def build_grammar
+      current_app_map = app_map
+      RubySpeech::GRXML.draw mode: :dtmf, root: 'options' do
+        rule id: 'options', scope: 'public' do
+          one_of do
+            current_app_map.keys.each do |index|
+              item do
+                index
+              end
+            end
+          end
+        end
+      end
     end
   end
 end
