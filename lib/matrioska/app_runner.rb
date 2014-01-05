@@ -6,6 +6,7 @@ module Matrioska
 
     def initialize(call)
       @call = call
+      register_runner_with_call
       @app_map = {}
       @running = false
     end
@@ -121,5 +122,11 @@ module Matrioska
         end
       end
     end
+
+    def register_runner_with_call
+      @call[:matrioska_runners] ||= []
+      @call[:matrioska_runners] << self
+    end
+
   end
 end
