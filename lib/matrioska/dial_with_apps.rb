@@ -38,15 +38,19 @@ module Matrioska
       dial = Adhearsion::CallController::Dial::ParallelConfirmationDial.new to, options, call
       yield dial
 
-      local_runner = Matrioska::AppRunner.new call
-      @local_runner_block.call local_runner
-      local_runner.start
+      if @local_runner_block
+        local_runner = Matrioska::AppRunner.new call
+        @local_runner_block.call local_runner
+        local_runner.start
+      end
 
       dial.prep_calls do |new_call|
         new_call.on_joined call do
-          remote_runner = Matrioska::AppRunner.new new_call
-          @remote_runner_block.call remote_runner
-          remote_runner.start
+          if @remote_runner_block
+            remote_runner = Matrioska::AppRunner.new new_call
+            @remote_runner_block.call remote_runner
+            remote_runner.start
+          end
         end
       end
 
