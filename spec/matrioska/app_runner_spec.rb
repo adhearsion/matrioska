@@ -43,6 +43,13 @@ module Matrioska
         subject.start
         subject.status.should == :started
       end
+
+      it "should do nothing if #start is called twice" do
+        call.should_receive(:write_and_await_response).once.with(input_component)
+        subject.start
+        subject.start
+      end
+
     end
 
     describe "#stop!" do

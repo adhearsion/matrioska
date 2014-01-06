@@ -12,6 +12,7 @@ module Matrioska
     end
 
     def start
+      return if started?
       @state = :started
       logger.debug "MATRIOSKA START CALLED"
       unless @running
