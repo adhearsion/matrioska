@@ -87,9 +87,9 @@ module Matrioska
         logger.debug "MATRIOSKA #match_and_run called with #{digit}"
         callback = lambda do |call|
           @running = false
-          logger.debug "MATRIOSKA CALLBACK RESTARTING LISTENER"
-          if call.active?
-            start unless stopped?
+          if call.active? && started?
+            logger.debug "MATRIOSKA CALLBACK RESTARTING LISTENER"
+            start
           else
             logger.debug "MATRIOSKA CALLBACK NOT DOING ANYTHING BECAUSE CALL IS DEAD"
           end
