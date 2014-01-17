@@ -121,6 +121,7 @@ module Matrioska
 
       it "executes the block if the payload is a Proc" do
         call.should_receive(:do_stuff_from_a_block).once
+        subject.should_receive(:started?).and_return true
         subject.should_receive(:start).once
         subject.handle_input_complete mock_event("34*")
         sleep 0.1 # Give the controller time to finish and the callback to fire
@@ -128,6 +129,7 @@ module Matrioska
 
       it "executes the controller if the payload is a Class" do
         call.should_receive(:do_stuff_from_a_class).once
+        subject.should_receive(:started?).and_return true
         subject.should_receive(:start).once
         subject.handle_input_complete mock_event("5")
         sleep 0.1 # Give the controller time to finish and the callback to fire
