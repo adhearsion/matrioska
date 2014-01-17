@@ -46,6 +46,7 @@ module Matrioska
 
       it "should do nothing if #start is called twice" do
         call.should_receive(:write_and_await_response).once.with(input_component)
+        subject.should_receive(:running?).once.and_return(true)
         subject.start
         subject.start
       end

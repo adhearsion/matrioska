@@ -8,26 +8,30 @@ module Matrioska
       @call = call
       register_runner_with_call
       @app_map = {}
-      @running = false
     end
 
     def start
-      return if started?
-      @state = :started
-      logger.debug "MATRIOSKA START CALLED"
-      unless @running
-        @component = Punchblock::Component::Input.new mode: :dtmf, inter_digit_timeout: Adhearsion.config[:matrioska].timeout * 1_000, grammar: { value: build_grammar }
-        logger.debug "MATRIOSKA STARTING LISTENER"
-        @component.register_event_handler Punchblock::Event::Complete do |event|
-          handle_input_complete event
-        end
-        @call.write_and_await_response @component if @call.active?
+      if started? && running?
+        logger.warn "Already-active runner #{self} received start event."
+        return
       end
+
+      @state = :started
+      logger.debug "MATRIOSKA STARTING LISTENER"
+      @component = Punchblock::Component::Input.new mode: :dtmf, inter_digit_timeout: Adhearsion.config[:matrioska].timeout * 1_000, grammar: { value: build_grammar }
+      @component.register_event_handler Punchblock::Event::Complete do |event|
+        handle_input_complete event
+      end
+      @call.write_and_await_response @component if @call.active?
     end
 
     def stop!
       @state = :stopped
-      @component.stop! if @component && @component.executing?
+      @component.stop! if running?
+    end
+
+    def running?
+      !!(@component && @component.executing?)
     end
 
     def status
@@ -63,13 +67,13 @@ module Matrioska
 
     def handle_input_complete(event)
       if @state == :stopped
-        logger.warn "Stopped runner #{self} received event."
+        logger.warn "Stopped runner #{self} received stop event."
         return
       end
       logger.debug "MATRIOSKA HANDLING INPUT"
       result = event.reason.respond_to?(:utterance) ? event.reason.utterance : nil
       digit = parse_dtmf result
-      match_and_run digit unless @running
+      match_and_run digit
     end
 
     private
@@ -81,7 +85,6 @@ module Matrioska
     def match_and_run(digit)
       if match = @app_map[digit]
         logger.debug "MATRIOSKA #match_and_run called with #{digit}"
-        @running = true
         callback = lambda do |call|
           @running = false
           logger.debug "MATRIOSKA CALLBACK RESTARTING LISTENER"
