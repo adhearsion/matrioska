@@ -11,4 +11,9 @@ RSpec.configure do |config|
   config.before :suite do
     Adhearsion::Logging.start Adhearsion::Logging.default_appenders, :trace, Adhearsion.config.platform.logging.formatter
   end
+
+  config.before do
+    @uuid = SecureRandom.uuid
+    Punchblock.stub new_request_id: @uuid
+  end
 end
