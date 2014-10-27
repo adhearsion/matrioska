@@ -22,7 +22,7 @@ module Matrioska
       @component.register_event_handler Punchblock::Event::Complete do |event|
         handle_input_complete event
       end
-      @call.write_and_await_response @component if @call.active?
+      @call.write_and_await_response @component if @call.alive? && @call.active?
     end
 
     def stop!
@@ -87,7 +87,7 @@ module Matrioska
         logger.debug "MATRIOSKA #match_and_run called with #{digit}"
         callback = lambda do |call|
           @running = false
-          if call.active? && started?
+          if call.alive? && call.active? && started?
             logger.debug "MATRIOSKA CALLBACK RESTARTING LISTENER"
             start
           else
