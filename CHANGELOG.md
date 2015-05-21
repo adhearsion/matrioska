@@ -1,4 +1,4 @@
-# develop
+# Version 0.3.0
   * Feature: added multi-digit patterns
   * Feature: added inter-digit timeout to support multi-digit patterns
 

@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.version     = Matrioska::VERSION
   s.authors     = ["Luca Pradovera"]
   s.email       = ["lpradovera@mojolingo.com"]
-  s.homepage    = "https://github.com/polysics/matrioska"
+  s.homepage    = "https://github.com/adhearsion/matrioska"
   s.summary     = %q{Adhearsion plugin for in-call apps}
   s.description = %q{Adhearsion plugin for in-call apps. Provides a features-style interface to run applications in calls.}
   s.license     = 'MIT'
