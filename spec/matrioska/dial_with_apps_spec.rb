@@ -143,5 +143,75 @@ describe Matrioska::DialWithApps do
       second_other_mock_call << mock_end
       dial_thread.join.should be_true
     end
+
+    it "allows specifying only a local listener" do
+      call.should_receive(:answer).once
+
+      mock_local_runner.should_receive(:bar).once
+      mock_local_runner.should_receive(:start).once
+
+      mock_remote_runner = nil
+
+      other_mock_call.should_receive(:dial).with(to, from: 'foo').once
+      other_mock_call.should_receive(:hangup).once.and_return do
+        other_mock_call << mock_end
+      end
+
+      second_other_mock_call.should_receive(:dial).with(second_to, from: 'foo').once
+      second_other_mock_call.should_receive(:join).once.and_return do
+        second_other_mock_call << Punchblock::Event::Joined.new(call_uri: call_id)
+      end
+
+      dial_thread = Thread.new do
+        controller.instance_exec(to,second_to) do |to, second_to|
+            dial_with_apps([to, second_to], from: 'foo') do |dial|
+
+            local do |runner|
+              runner.bar
+            end
+          end
+        end
+      end
+
+      sleep 0.1
+      second_other_mock_call << mock_answered
+      second_other_mock_call << mock_end
+      dial_thread.join.should be_true
+    end
+
+    it "allows specifying only a remote listener" do
+      call.should_receive(:answer).once
+
+      mock_local_runner = nil
+
+      mock_remote_runner.should_receive(:bar).once
+      mock_remote_runner.should_receive(:start).once
+
+      other_mock_call.should_receive(:dial).with(to, from: 'foo').once
+      other_mock_call.should_receive(:hangup).once.and_return do
+        other_mock_call << mock_end
+      end
+
+      second_other_mock_call.should_receive(:dial).with(second_to, from: 'foo').once
+      second_other_mock_call.should_receive(:join).once.and_return do
+        second_other_mock_call << Punchblock::Event::Joined.new(call_uri: call_id)
+      end
+
+      dial_thread = Thread.new do
+        controller.instance_exec(to,second_to) do |to, second_to|
+            dial_with_apps([to, second_to], from: 'foo') do |dial|
+
+            remote do |runner|
+              runner.bar
+            end
+          end
+        end
+      end
+
+      sleep 0.1
+      second_other_mock_call << mock_answered
+      second_other_mock_call << mock_end
+      dial_thread.join.should be_true
+    end
   end
 end

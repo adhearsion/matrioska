@@ -1,4 +1,6 @@
-# develop
+# Version 0.3.0
+  * Feature: added multi-digit patterns
+  * Feature: added inter-digit timeout to support multi-digit patterns
 
 # Version 0.2.1
   * Don't require manual loading of `DialWithApps`
