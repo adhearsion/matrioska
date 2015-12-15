@@ -2,7 +2,9 @@
 
 # Matrioska
 
-Matrioska is an Adhearsion plugin for running in-call apps at the press of a DTMF.
+Matrioska is an Adhearsion plugin for creating in-call voice apps.
+
+Matrioska helps you do more asynchronous things than Adhearsion alone. For example, you can start a long phone call and have Matrioska listening in the background for keypresses. When a keypress is detected, it can execute application code, for example, to transfer the call or to start or stop a recording.  You can think of Matrioska as “background apps for Adhearsion.”
 
 By mapping controllers or blocks to the desired applications, a listener object waits for DTMF and reacts by executing the specified payload.
 
