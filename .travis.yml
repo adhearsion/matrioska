@@ -13,3 +13,4 @@ matrix:
     - rvm: 1.9.2
     - rvm: rbx-19mode
     - rvm: ruby-head
+sudo: false
