@@ -14,7 +14,7 @@ describe Matrioska::DialWithApps do
   let(:second_other_call_id)    { SecureRandom.uuid }
   let(:second_other_mock_call)  { Adhearsion::OutboundCall.new }
 
-  let(:mock_answered) { Punchblock::Event::Answered.new }
+  let(:mock_answered) { Adhearsion::Event::Answered.new }
 
   before do
     controller_class.mixin described_class
@@ -24,14 +24,14 @@ describe Matrioska::DialWithApps do
   end
 
   def mock_end(reason = :hangup_command)
-    Punchblock::Event::End.new.tap { |event| event.stub reason: reason }
+    Adhearsion::Event::End.new.tap { |event| event.stub reason: reason }
   end
 
   describe "#dial_with_local_apps" do
     it "starts an app listener on the originating call using the passed block, dials the call to the correct endpoint, and returns a dial status object" do
       mock_app_runner = Matrioska::AppRunner.new call
       Matrioska::AppRunner.should_receive(:new).once.with(call).and_return mock_app_runner
-      mock_app_runner.should_receive(:foo).once.with(instance_of(Adhearsion::CallController::Dial::ParallelConfirmationDial))
+      mock_app_runner.should_receive(:foo).once.with(instance_of(Adhearsion::CallController::Dial::Dial))
       mock_app_runner.should_receive(:start).once
 
       Adhearsion::OutboundCall.should_receive(:new).and_return other_mock_call
@@ -61,7 +61,7 @@ describe Matrioska::DialWithApps do
       mock_app_runner = Matrioska::AppRunner.new other_mock_call
 
       Matrioska::AppRunner.should_receive(:new).once.with(second_other_mock_call).and_return mock_app_runner
-      mock_app_runner.should_receive(:foo).once.with(instance_of(Adhearsion::CallController::Dial::ParallelConfirmationDial))
+      mock_app_runner.should_receive(:foo).once.with(instance_of(Adhearsion::CallController::Dial::Dial))
       mock_app_runner.should_receive(:start).once
 
       Adhearsion::OutboundCall.should_receive(:new).and_return other_mock_call, second_other_mock_call
@@ -73,7 +73,7 @@ describe Matrioska::DialWithApps do
 
       second_other_mock_call.should_receive(:dial).with(second_to, :from => 'foo').once
       second_other_mock_call.should_receive(:join).once.and_return do
-        second_other_mock_call << Punchblock::Event::Joined.new(call_uri: call_id)
+        second_other_mock_call << Adhearsion::Event::Joined.new(call_uri: call_id)
       end
 
       dial_thread = Thread.new do
@@ -88,7 +88,7 @@ describe Matrioska::DialWithApps do
       end
 
       sleep 0.1
-      second_other_mock_call << Punchblock::Event::Answered.new
+      second_other_mock_call << Adhearsion::Event::Answered.new
       second_other_mock_call << mock_end
       dial_thread.join.should be_true
     end
@@ -121,7 +121,7 @@ describe Matrioska::DialWithApps do
 
       second_other_mock_call.should_receive(:dial).with(second_to, from: 'foo').once
       second_other_mock_call.should_receive(:join).once.and_return do
-        second_other_mock_call << Punchblock::Event::Joined.new(call_uri: call_id)
+        second_other_mock_call << Adhearsion::Event::Joined.new(call_uri: call_id)
       end
 
       dial_thread = Thread.new do
@@ -159,7 +159,7 @@ describe Matrioska::DialWithApps do
 
       second_other_mock_call.should_receive(:dial).with(second_to, from: 'foo').once
       second_other_mock_call.should_receive(:join).once.and_return do
-        second_other_mock_call << Punchblock::Event::Joined.new(call_uri: call_id)
+        second_other_mock_call << Adhearsion::Event::Joined.new(call_uri: call_id)
       end
 
       dial_thread = Thread.new do
@@ -194,7 +194,7 @@ describe Matrioska::DialWithApps do
 
       second_other_mock_call.should_receive(:dial).with(second_to, from: 'foo').once
       second_other_mock_call.should_receive(:join).once.and_return do
-        second_other_mock_call << Punchblock::Event::Joined.new(call_uri: call_id)
+        second_other_mock_call << Adhearsion::Event::Joined.new(call_uri: call_id)
       end
 
       dial_thread = Thread.new do

@@ -1,7 +1,7 @@
 module Matrioska
   module DialWithApps
     def dial_with_local_apps(to, options = {}, &block)
-      dial = Adhearsion::CallController::Dial::ParallelConfirmationDial.new to, options, call
+      dial = Adhearsion::CallController::Dial::Dial.new to, options, call
 
       runner = Matrioska::AppRunner.new call
       yield runner, dial
@@ -16,7 +16,7 @@ module Matrioska
     end
 
     def dial_with_remote_apps(to, options = {}, &block)
-      dial = Adhearsion::CallController::Dial::ParallelConfirmationDial.new to, options, call
+      dial = Adhearsion::CallController::Dial::Dial.new to, options, call
 
       dial.track_originating_call
 
@@ -35,7 +35,7 @@ module Matrioska
     end
 
     def dial_with_apps(to, options = {}, &block)
-      dial = Adhearsion::CallController::Dial::ParallelConfirmationDial.new to, options, call
+      dial = Adhearsion::CallController::Dial::Dial.new to, options, call
       yield dial
 
       if @local_runner_block

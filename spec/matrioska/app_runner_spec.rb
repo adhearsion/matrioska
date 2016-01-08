@@ -35,7 +35,7 @@ module Matrioska
       }
 
       let(:input_component) {
-        Punchblock::Component::Input.new mode: :dtmf, inter_digit_timeout: Adhearsion.config[:matrioska].timeout.to_i * 1_000, grammar: { value: grxml }
+        Adhearsion::Rayo::Component::Input.new mode: :dtmf, inter_digit_timeout: Adhearsion.config[:matrioska].timeout.to_i * 1_000, grammar: { value: grxml }
       }
 
       it "should start the appropriate component" do
@@ -54,10 +54,10 @@ module Matrioska
     end
 
     describe "#stop!" do
-      let(:mock_component) { double Punchblock::Component::Input, register_event_handler: true }
+      let(:mock_component) { double Adhearsion::Rayo::Component::Input, register_event_handler: true }
 
       before do
-        Punchblock::Component::Input.stub(:new).and_return mock_component
+        Adhearsion::Rayo::Component::Input.stub(:new).and_return mock_component
         call.stub(:write_and_await_response)
         subject.start
       end

@@ -1,7 +1,5 @@
 module Matrioska
   class AppRunner
-    include Adhearsion::CallController::Utility
-
     VALID_DIGITS = /[^0-9*#]/
 
     def initialize(call)
@@ -18,8 +16,8 @@ module Matrioska
 
       @state = :started
       logger.debug "MATRIOSKA STARTING LISTENER"
-      @component = Punchblock::Component::Input.new mode: :dtmf, inter_digit_timeout: Adhearsion.config[:matrioska].timeout * 1_000, grammar: { value: build_grammar }
-      @component.register_event_handler Punchblock::Event::Complete do |event|
+      @component = Adhearsion::Rayo::Component::Input.new mode: :dtmf, inter_digit_timeout: Adhearsion.config[:matrioska].timeout * 1_000, grammar: { value: build_grammar }
+      @component.register_event_handler Adhearsion::Event::Complete do |event|
         handle_input_complete event
       end
       @call.write_and_await_response @component if @call.alive? && @call.active?
@@ -71,9 +69,11 @@ module Matrioska
         return
       end
       logger.debug "MATRIOSKA HANDLING INPUT"
-      result = event.reason.respond_to?(:utterance) ? event.reason.utterance : nil
-      digit = parse_dtmf result
-      match_and_run digit
+      utterance = event.reason.respond_to?(:utterance) ? event.reason.utterance : nil
+      result = Adhearsion::CallController::Input::Result.new
+      result.mode = :dtmf
+      result.utterance = utterance
+      match_and_run result.utterance
     end
 
     private
